@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile_front
+    volumes:
+      - /home/edgar/Desktop/dockertest/green-gyumri-front:/app
+    ports:
+      - "3001:3001"
+    expose:
+      - "3001"
+    command: yarn start
+    depends_on:
+      - "back"
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile_admin
+    volumes:
+      - /home/edgar/Desktop/dockertest/green-gyumri-admin:/app
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    command: yarn start
+    depends_on:
+      - "back"
+  back:
+    build:
+      context: .
+      dockerfile: Dockerfile_back
+    volumes:
+      - /home/edgar/Desktop/dockertest/green-gyumri-back:/app
+    ports:
+      - "4000:4000"
+    expose:
+      - "4000"
+    command: yarn start
+    depends_on:
+      - "db"
+    networks:
+      - my_network
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: greengyumri
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - my_network
+volumes:
+  db-data:
+networks:
+  my_network:
+    driver: bridge
